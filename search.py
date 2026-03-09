@@ -103,10 +103,12 @@ class Search:
 
         count = 0
         writer = self.ix.writer()
-        for root, dirs, files in os.walk(file_dir, followlinks=True):
-            for file in files:
-                if file.endswith(".md") or file.endswith("markdown"):
-                    path = os.path.join(root, file)
+        for dirpath, dirnames, filenames in os.walk(file_dir, followlinks=True):
+            # Modify the dirnames list in-place to exclude unwanted directories
+            dirnames[:] = [d for d in dirnames if d not in config["IGNORED_DIRS"]]
+            for filename in filenames:
+                if filename.endswith(".md") or filename.endswith("markdown"):
+                    path = os.path.join(dirpath, filename)
                     self.add_document(writer, path, config)
                     count += 1
         writer.commit()
@@ -118,10 +120,12 @@ class Search:
             self.open_index(self.index_folder, create_new=True)
 
         all_files = []
-        for root, dirs, files in os.walk(file_dir, followlinks=True):
-            for file in files:
-                if file.endswith(".md") or file.endswith("markdown"):
-                    path = os.path.join(root, file)
+        for dirpath, dirnames, filenames in os.walk(file_dir, followlinks=True):
+            # Modify the dirnames list in-place to exclude unwanted directories
+            dirnames[:] = [d for d in dirnames if d not in config["IGNORED_DIRS"]]
+            for filename in filenames:
+                if filename.endswith(".md") or filename.endswith("markdown"):
+                    path = os.path.join(dirpath, filename)
                     all_files.append(path)
 
         # see: https://pythonhosted.org/Whoosh/indexing.html#incremental-indexing
